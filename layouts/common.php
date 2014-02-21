@@ -136,6 +136,16 @@ function login_check($mysqli) {
         return false;
     }
 }
+
+function check_exists($field, $val, $table) {
+	$mysqli = new mysqli(HOST, USER, PASSWORD, DATABASE);
+    $query = "SELECT COUNT(*) AS num_rows FROM $table WHERE $field = $val";
+    if ($stmt = $mysqli->query($query)) {
+        return $stmt->num_rows;
+    }
+    return 0;
+}
+
 function esc_url($url) {
  
     if ('' == $url) {

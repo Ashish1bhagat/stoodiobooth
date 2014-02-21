@@ -24,16 +24,25 @@ if(isset($_POST['tid'])){
 	$tweet = $mysqli->real_escape_string($_POST['tweet']);
 	$user = $mysqli->real_escape_string($_POST['user']);
 	$upic = $mysqli->real_escape_string($_POST['upic']);
-	if ($insert_stmt = $mysqli->prepare("INSERT INTO event_tweets (tweet_id, tweet, user, picture) VALUES (?, ?, ?, ?)")) {
-		$insert_stmt->bind_param('isss', $tid, $tweet, $user, $upic);
-		if (!$insert_stmt->execute()) {
-			$arr = array('passed'=>$i, 'status' => 'error', 'redirect' => BASEURL .'/event.php?event='.$eid);
-			echo json_encode($arr);
-			die;
+	
+	$exist = check_exists('tweet_id', $tid, 'event_tweets');
+	if($exist){
+		$arr = array('status' => 'error', 'msg'=>'Tweet already exist', 'redirect' => BASEURL .'/event.php?event='.$eid);
+		echo json_encode($arr);
+		exit;		
+	}else{		
+		if ($insert_stmt = $mysqli->prepare("INSERT INTO event_tweets (tweet_id, tweet, user, picture) VALUES (?, ?, ?, ?)")) {
+			$insert_stmt->bind_param('isss', $tid, $tweet, $user, $upic);
+			if (!$insert_stmt->execute()) {
+				$arr = array('status' => 'error', 'redirect' => BASEURL .'/event.php?event='.$eid);
+				echo json_encode($arr);
+				exit;
+			}
 		}
+		$arr = array('status' => 'success', 'redirect' => BASEURL .'/event.php?event='.$eid);
+		echo json_encode($arr);
+		exit;
 	}
-	echo "die";
-	die;
 }
 
  ?>
